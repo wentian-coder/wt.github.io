@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>现金转盘抽奖</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+        }
+        .wheel {
+            width: 300px;
+            height: 300px;
+            background-color: #ffcc00;
+            border-radius: 50%;
+            margin: 50px auto;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .total-amount, .total-fragments {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        .withdraw-button {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>现金转盘抽奖</h1>
+    <div class="wheel">
+        <button class="button" onclick="spinWheel()">抽奖</button>
+    </div>
+    <div class="result" id="result"></div>
+    <div class="total-amount" id="total-amount">累计金额: ￥0.00</div>
+    <div class="total-fragments" id="total-fragments">累计碎片: 0/10</div>
+    <button class="withdraw-button button" onclick="withdraw()">提现</button>
+
+    <script>
+        let totalAmount = 0;
+        let totalFragments = 0;
+        let remainingChances = 10;
+
+        const prizes = [
+            { name: "谢谢参与", probability: 30 },
+            { name: "0.01元红包", amount: 0.01, probability: 20 },
+            { name: "0.02元红包", amount: 0.02, probability: 10 },
+            { name: "0.05元红包", amount: 0.05, probability: 5 },
+            { name: "10元红包碎片", probability: 34.9 },
+            { name: "10元红包", amount: 10, probability: 0.1 }
+        ];
+
+        function getRandomPrize() {
+            let rand = Math.random() * 100;
+            let cumulativeProbability = 0;
+            for (let prize of prizes) {
+                cumulativeProbability += prize.probability;
+                if (rand <= cumulativeProbability) {
+                    return prize;
+                }
+            }
+        }
+
+        function spinWheel() {
+            if (remainingChances <= 0) {
+                let input = prompt("请输入口令以获得一次抽奖机会");
+                if (input === "闻天哥哥好厉害") {
+                    remainingChances++;
+                } else {
+                    alert("口令错误，无法获得抽奖机会");
+                    return;
+                }
+            }
+
+            remainingChances--;
+            let prize = getRandomPrize();
+            if (prize.name === "10元红包碎片") {
+                totalFragments++;
+                if (totalFragments === 10) {
+                    totalAmount += 10;
+                    totalFragments = 0;
+                    document.getElementById("result").innerText = "恭喜您获得10元红包";
+                } else {
+                    document.getElementById("result").innerText = "恭喜您获得10元红包碎片";
+                }
+            } else if (prize.amount) {
+                totalAmount += prize.amount;
+                document.getElementById("result").innerText = "恭喜您获得" + prize.name;
+            } else {
+                document.getElementById("result").innerText = prize.name;
+            }
+
+            document.getElementById("total-amount").innerText = "累计金额: ￥" + totalAmount.toFixed(2);
+            document.getElementById("total-fragments").innerText = "累计碎片: " + totalFragments + "/10";
+        }
+
+        function withdraw() {
+            if (totalAmount >= 10) {
+                alert("提现成功");
+            } else {
+                alert("金额未满10元，柯柯再接再厉");
+            }
+        }
+    </script>
+</body>
+</html>
